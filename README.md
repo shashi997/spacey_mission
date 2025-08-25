@@ -34,3 +34,54 @@ This section outlines the key features of the application, with a checklist to t
 - [x] **User Authentication**: A system for user sign-up and login.  
 
 ---
+
+
+## 📂 Client Project Structure
+
+```
+src/
+├── features/
+│   ├── authentication/
+│   │   ├── components/
+│   │   │   ├── LoginForm.jsx
+│   │   │   └── SignUpForm.jsx
+│   │   ├── hooks/
+│   │   │   └── useAuth.js
+│   │   └── index.js         // Exports everything from this feature
+│   ├── lesson/
+│   │   ├── components/
+│   │   │   ├── ChatWindow.jsx
+│   │   │   ├── LessonOutline.jsx
+│   │   │   ├── InteractiveCanvas.jsx
+│   │   │   └── MessageTypes/
+│   │   │       ├── ExplanationMessage.jsx
+│   │   │       └── QuizMessage.jsx
+│   │   ├── hooks/
+│   │   │   └── useLessonState.js
+│   │   ├── services/
+│   │   │   └── lessonAPI.js   // Handles API calls to the backend
+│   │   └── index.js
+│   └── dashboard/
+│       ├── components/
+│       │   ├── LessonCard.jsx
+│       │   └── ContinueLesson.jsx
+│       └── ...
+├── components/               // Shared, reusable components (Button, Input, Modal)
+│   ├── Button.jsx
+│   └── LoadingSpinner.jsx
+├── hooks/                    // Shared, global hooks
+│   └── useAPI.js
+├── lib/                      // External libraries or helper functions
+│   └── axios.js              // Pre-configured Axios instance
+├── pages/                    // Top-level page components that assemble features
+│   ├── HomePage.jsx
+│   ├── DashboardPage.jsx
+│   └── LessonPage.jsx
+├── services/                 // Global API services
+│   └── api.js
+├── state/                    // Global state management (Zustand, Redux, Context)
+│   └── store.js
+├── App.jsx
+└── main.jsx
+```
+
