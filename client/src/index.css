@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --color-deep-black: #080808;
+  --color-cyan-green: #2EF3D1;
+  --color-electric-blue: #24E3EE;
+  --color-yellow: #ffff66;
+}
+
+/* It's better to add these colors to your tailwind.config.js */
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(46, 243, 209, 0.4), 0 0 20px rgba(46, 243, 209, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(46, 243, 209, 0.6), 0 0 40px rgba(46, 243, 209, 0.4);
+  }
+}
+
+@keyframes yellow-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255,255,102,0.3); }
+  50% { box-shadow: 0 0 20px rgba(255,255,102,0.7); }
+}
+
+body { font-family: 'Inter', sans-serif; }
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-yellow-glow {
+  animation: yellow-glow 2s ease-in-out infinite;
+}
