@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogIn, LogOut, User } from 'lucide-react';
-import { useAuth } from '../features/authentication/hooks/useAuth';
+import { useAuth } from '../features/authentication';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -120,4 +120,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../features/authentication/hooks/useAuth';
+import { useAuth } from '../features/authentication';
 import { Link } from 'react-router-dom';
 import { Rocket, BookOpen, BarChart3, Award, Settings } from 'lucide-react';
 

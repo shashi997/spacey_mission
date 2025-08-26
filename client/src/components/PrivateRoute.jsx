@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../features/authentication/hooks/useAuth';
+import { useAuth } from '../features/authentication';
 
 const PrivateRoute = () => {
   const { user, isLoading } = useAuth();
@@ -23,4 +23,3 @@ const PrivateRoute = () => {
 };
 
 export default PrivateRoute;
-

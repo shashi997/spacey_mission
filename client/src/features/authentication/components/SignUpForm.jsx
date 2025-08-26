@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth'; // Import the useAuth hook
+import { useAuth } from '..'; // Import the useAuth hook
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore'; // Import Firestore functions
 import { db } from '../../../lib/firebase'; // Import the Firestore instance
 
