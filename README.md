@@ -1,15 +1,15 @@
 # 🚀 Spacey Mission
 
 ## Project Overview
-**Spacey Mission** is an AI-powered educational platform designed to provide a personalized and engaging learning experience.  
+**Spacey Mission** is an AI-powered educational platform designed to provide a personalized and engaging learning experience. The project is structured as a monorepo to cleanly separate the concerns of the user-facing application, the administrative backend, and the server-side logic.
 
 At its core lies a **multi-LLM routing strategy**, where a **central orchestrator LLM** intelligently manages specialized LLMs (like an Explainer, Quiz, and Canvas LLM) to deliver dynamic and interactive content.
 
 The project’s vision is to create an **adaptive learning environment** with:
-- Gamification  
-- Progress tracking  
-- A user-friendly interface  
-- Personalized AI tutor guidance  
+- Gamification
+- Progress tracking
+- A user-friendly interface
+- Personalized AI tutor guidance
 
 ---
 
@@ -17,26 +17,32 @@ The project’s vision is to create an **adaptive learning environment** with:
 This section outlines the key features of the application, with a checklist to track progress.
 
 ### Core Architecture
-- [ ] **AI Orchestrator System**: A central LLM that routes user queries to specialized LLMs based on pedagogical needs.  
-- [ ] **Specialized LLMs**: Dedicated models for explanations, quizzes, Socratic dialogues, and visual aids.  
-- [ ] **Conditional UI Rendering**: The front-end dynamically renders different components (text, quiz, canvas) based on the AI's response.  
+- [ ] **AI Orchestrator System**: A central LLM that routes user queries to specialized LLMs based on pedagogical needs.
+- [ ] **Specialized LLMs**: Dedicated models for explanations, quizzes, Socratic dialogues, and visual aids.
+- [ ] **Conditional UI Rendering**: The front-end dynamically renders different components (text, quiz, canvas) based on the AI's response.
 
 ### User Experience
-- [x] **User Dashboard**: A personalized hub for the user after login.  
-- [ ] **Proactive Recommendations**: Lessons suggested by the AI based on the user’s progress.  
-- [ ] **Gamification Hub**: Awards, badges, and leaderboards to motivate users.  
-- [ ] **Progress & Stats Page**: Analytics with graphs and charts for tracking mastery and time spent.  
-- [ ] **Lessons Catalog**: A browsable library of all available subjects and lessons.  
+-[x] **User Dashboard**: A personalized hub for the user after login.
+- [ ] **Proactive Recommendations**: Lessons suggested by the AI based on the user’s progress.
+- [ ] **Gamification Hub**: Awards, badges, and leaderboards to motivate users.
+- [ ] **Progress & Stats Page**: Analytics with graphs and charts for tracking mastery and time spent.
+- [ ] **Lessons Catalog**: A browsable library of all available subjects and lessons.
+
+### Admin & Content Management
+- [ ] **Admin Dashboard**: A separate, secure application for content management.
+- [ ] **Lesson Design System**: A visual interface (e.g., node editor, knowledge graph) for creating and structuring lessons.
+- [ ] **Direct Database Interaction**: Secure endpoints for admins to create, read, update, and delete lesson content.
 
 ### Data & Technology
-- [ ] **Firebase Firestore Integration**: To store user data, learning paths, and achievements.  
-- [ ] **Source Document Ingestion**: Backend process to chunk and index educational content for the LLM.  
-- [x] **User Authentication**: A system for user sign-up and login.  
+- [ ] **Firebase Firestore Integration**: To store user data, learning paths, and achievements.
+- [ ] **Source Document Ingestion**: Backend process to chunk and index educational content for the LLM.
+- [x] **User Authentication**: A system for user sign-up and login.
 
 ---
 
 
-## 📂 Client Project Structure
+## 📂 Project Structure
+The project is organized as a monorepo with distinct directories for the client-facing app, the admin panel, and the server.
 
 ```
 src/
@@ -84,4 +90,3 @@ src/
 ├── App.jsx
 └── main.jsx
 ```
-
