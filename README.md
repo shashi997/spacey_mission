@@ -22,7 +22,7 @@ This section outlines the key features of the application, with a checklist to t
 - [ ] **Conditional UI Rendering**: The front-end dynamically renders different components (text, quiz, canvas) based on the AI's response.
 
 ### User Experience
--[x] **User Dashboard**: A personalized hub for the user after login.
+- [x] **User Dashboard**: A personalized hub for the user after login.
 - [ ] **Proactive Recommendations**: Lessons suggested by the AI based on the user’s progress.
 - [ ] **Gamification Hub**: Awards, badges, and leaderboards to motivate users.
 - [ ] **Progress & Stats Page**: Analytics with graphs and charts for tracking mastery and time spent.
