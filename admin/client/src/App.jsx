@@ -1,7 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import DashboardHome from './pages/DashboardHome';
 import ProtectedRoute from './components/ProtectedRoute';
+import Users from './pages/Users';
+import Lessons from './pages/Lessons';
+import LessonEditor from './pages/LessonEditor';
 
 
 function App() {
@@ -13,7 +17,13 @@ function App() {
       
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />}>
+          <Route index element={<DashboardHome />} />
+          <Route path="users" element={<Users />} />
+          <Route path="lessons" element={<Lessons />} /> 
+          <Route path="lessons/new" element={<LessonEditor />} />
+          <Route path="lessons/edit/:lessonId" element={<LessonEditor />} />
+        </Route>
       </Route>
 
       {/* Redirect root to login for simplicity */}
