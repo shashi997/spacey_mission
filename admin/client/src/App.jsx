@@ -6,6 +6,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Users from './pages/Users';
 import Lessons from './pages/Lessons';
 import LessonEditor from './pages/LessonEditor';
+import LessonDesigns from './pages/LessonDesigns';
+import LessonDesigner from './pages/LessonDesigner';
 
 
 function App() {
@@ -20,9 +22,11 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />}>
           <Route index element={<DashboardHome />} />
           <Route path="users" element={<Users />} />
-          <Route path="lessons" element={<Lessons />} /> 
+          <Route path="lessons" element={<Lessons />} />
+          <Route path="lesson-designs" element={<LessonDesigns />} />
           <Route path="lessons/new" element={<LessonEditor />} />
           <Route path="lessons/edit/:lessonId" element={<LessonEditor />} />
+          <Route path="lesson-designs/design/:lessonId" element={<LessonDesigner />} />
         </Route>
       </Route>
 

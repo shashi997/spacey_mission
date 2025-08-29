@@ -29,7 +29,7 @@ This section outlines the key features of the application, with a checklist to t
 - [ ] **Lessons Catalog**: A browsable library of all available subjects and lessons.
 
 ### Admin & Content Management
-- [ ] **Admin Dashboard**: A separate, secure application for content management.
+- [x] **Admin Dashboard**: A separate, secure application for content management.
 - [ ] **Lesson Design System**: A visual interface (e.g., node editor, knowledge graph) for creating and structuring lessons.
 - [ ] **Direct Database Interaction**: Secure endpoints for admins to create, read, update, and delete lesson content.
 

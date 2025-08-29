@@ -27,7 +27,16 @@ const Sidebar = () => {
               Lessons
             </NavLink>
           </li>
-          {/* You can add more navigation links here */}
+          <li>
+            <NavLink
+              to="/dashboard/lesson-designs"
+              className={({ isActive }) =>
+                `block py-2 px-4 rounded ${isActive ? 'bg-gray-700' : 'hover:bg-gray-700'}`
+              }
+            >
+              Lesson Design
+            </NavLink>
+          </li>
         </ul>
       </nav>
     </aside>
