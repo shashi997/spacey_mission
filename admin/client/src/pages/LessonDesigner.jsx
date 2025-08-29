@@ -1,64 +1,72 @@
 import React, { useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  ReactFlow,
-  Controls,
-  Background,
-  applyNodeChanges,
-  applyEdgeChanges,
-  addEdge,
-} from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
+import { ReactFlowProvider, useNodesState, useEdgesState } from '@xyflow/react';
+import LessonBuilder from '../features/builder/components/LessonBuilder';
+import NodePalette from '../features/builder/components/NodePalette';
+import InspectorPanel from '../features/builder/components/InspectorPanel';
 
+// Centralizing initial state for the lesson builder
 const initialNodes = [
-  { id: '1', type: 'input', position: { x: 250, y: 5 }, data: { label: 'Lesson Start' } },
-  { id: '2', position: { x: 250, y: 100 }, data: { label: 'Content Block' } },
-  { id: '3', position: { x: 250, y: 200 }, data: { label: 'Quiz' } },
-  { id: '4', type: 'output', position: { x: 250, y: 300 }, data: { label: 'Lesson End' } },
+  { id: '1', type: 'input', position: { x: 250, y: 50 }, data: { label: 'Lesson Start' } },
+  { id: '2', type: 'output', position: { x: 250, y: 350 }, data: { label: 'Lesson End' } },
 ];
-const initialEdges = [
-  { id: 'e1-2', source: '1', target: '2', animated: true },
-  { id: 'e2-3', source: '2', target: '3' },
-  { id: 'e3-4', source: '3', target: '4' },
-];
+const initialEdges = [];
 
 const LessonDesigner = () => {
   const { lessonId } = useParams();
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [selectedNode, setSelectedNode] = useState(null);
 
-  const onNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    [setNodes]
-  );
-  const onEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges]
-  );
-  const onConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)),
-    [setEdges]
-  );
+  // State for nodes and edges is now managed here, at the top level.
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // This callback is passed to the LessonBuilder to update the selected node
+  // which in turn determines which sidebar panel to show.
+  const handleSelectionChange = useCallback(({ nodes }) => {
+    // We only show the inspector if a single node is selected
+    setSelectedNode(nodes.length === 1 ? nodes[0] : null);
+  }, []);
+
+  // This callback is passed to the InspectorPanel to update node data.
+  const handleNodeUpdate = useCallback((nodeId, data) => {
+    setNodes((nds) =>
+      nds.map((n) =>
+        n.id === nodeId
+          ? { ...n, data: { ...n.data, ...data } }
+          : n
+      )
+    );
+  }, [setNodes]);
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Lesson Design: {lessonId}</h2>
-      <p className="mb-4 text-gray-600">Visually design the flow of your lesson by adding, connecting, and arranging nodes.</p>
-      <div className="flex-grow border rounded-lg">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          fitView
-          className="bg-gray-50"
-        >
-          <Controls />
-          <Background />
-        </ReactFlow>
+    <ReactFlowProvider>
+      <div className="flex h-screen w-full bg-gray-100 font-sans">
+        {/* Left Sidebar */}
+        <aside className="w-80 flex-shrink-0 bg-white shadow-lg p-4 overflow-y-auto border-r border-gray-200">
+          {selectedNode ? (
+            <InspectorPanel
+              key={selectedNode.id} // Force re-mount on node change
+              node={selectedNode}
+              onNodeUpdate={handleNodeUpdate}
+            />
+          ) : (
+            <NodePalette />
+          )}
+        </aside>
+  
+        {/* Main Canvas Area */}
+        <main className="flex-grow h-full">
+          <LessonBuilder
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            setEdges={setEdges}
+            onSelectionChange={handleSelectionChange}
+          />
+        </main>
       </div>
-    </div>
+    </ReactFlowProvider>
   );
 };
 
