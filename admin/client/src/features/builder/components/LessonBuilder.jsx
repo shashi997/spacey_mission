@@ -6,8 +6,11 @@ import {
   addEdge,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { nodeTypes } from '../nodes/CustomNodes';
-
+import NarrationNode from '../nodes/NarrationNode';
+import QuizNode from '../nodes/QuizNode';
+import ChoiceNode from '../nodes/ChoiceNode';
+import AITriggerNode from '../nodes/AITriggerNode';
+import GameInteractionNode from '../nodes/GameInteractionNode';
 
 const LessonBuilder = ({
   nodes,
@@ -17,6 +20,13 @@ const LessonBuilder = ({
   setEdges,
   onSelectionChange,
 }) => {
+  const nodeTypes = {
+    narration: NarrationNode,
+    quiz: QuizNode,
+    choice: ChoiceNode,
+    aiTrigger: AITriggerNode,
+    gameInteraction: GameInteractionNode,
+  };
   
   // The onConnect callback is used to add new edges to the state.
   // It receives the `setEdges` function from the parent component.
