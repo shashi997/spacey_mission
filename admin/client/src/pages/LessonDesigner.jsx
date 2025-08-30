@@ -1,30 +1,55 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { ReactFlowProvider, useNodesState, useEdgesState, useReactFlow, useStore  } from '@xyflow/react';
+import {
+  ReactFlowProvider,
+  useReactFlow,
+  useStore,
+  addEdge,
+  applyNodeChanges,
+  applyEdgeChanges,
+} from '@xyflow/react';
 import LessonBuilder from '../features/builder/components/LessonBuilder';
 import NodePalette from '../features/builder/components/NodePalette';
 import InspectorPanel from '../features/builder/components/InspectorPanel';
+import {
+  addNodeToLesson,
+  updateNodeInLesson,
+  deleteNodeFromLesson,
+  addEdgeToLesson,
+  deleteEdgeFromLesson,
+  subscribeToNodeUpdates,
+  subscribeToEdgeUpdates,
+} from '../features/builder/services/api';
 
 // Centralizing initial state for the lesson builder
-const initialNodes = [
-  { id: '1', type: 'input', position: { x: 250, y: 50 }, data: { label: 'Lesson Start' } },
-  { id: '2', type: 'output', position: { x: 250, y: 350 }, data: { label: 'Lesson End' } },
-];
+const initialNodes = [];
 const initialEdges = [];
 
 const LessonDesignerContent = () => {
   const { lessonId } = useParams();
   const [selectedNode, setSelectedNode] = useState(null);
 
-  // State for nodes and edges is now managed here, at the top level.
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes] = useState(initialNodes);
+  const [edges, setEdges] = useState(initialEdges);
   const { screenToFlowPosition } = useReactFlow();
   const flowWidth = useStore((state) => state.width);
   const flowHeight = useStore((state) => state.height);
+ 
+  useEffect(() => {
+    if (!lessonId) {
+      console.error('Lesson ID is missing!');
+      return;
+    }
+    const unsubscribeNodes = subscribeToNodeUpdates(lessonId, setNodes);
+    const unsubscribeEdges = subscribeToEdgeUpdates(lessonId, setEdges);
+    return () => {
+      unsubscribeNodes();
+      unsubscribeEdges();
+    };
+  }, [lessonId, setNodes, setEdges]);
 
-  // Handler for adding a new node from the palette
-  const handleAddNode = useCallback((nodeType) => {
+  const handleAddNode = useCallback(
+    async (nodeType) => {
     // This logic places the new node in the center of the viewport.
     const position = screenToFlowPosition({
       x: flowWidth / 2,
@@ -32,7 +57,6 @@ const LessonDesignerContent = () => {
     });
 
     const newNode = {
-      id: `node_${+new Date()}`,
       type: nodeType,
       position,
       data: {},
@@ -56,8 +80,82 @@ const LessonDesignerContent = () => {
       };
     }
 
-    setNodes((nds) => nds.concat(newNode));
-  }, [screenToFlowPosition, setNodes, flowWidth, flowHeight]);
+    try {
+      // Let the onSnapshot listener handle adding the node to the state.
+      // This creates a single source of truth for state updates.
+      await addNodeToLesson(lessonId, newNode);
+    } catch (error) {
+      console.error('Error adding node:', error);
+    }
+  },
+  [screenToFlowPosition, flowWidth, flowHeight, lessonId]
+);
+
+  const onNodesChange = useCallback(
+    (changes) => {
+      // Use a functional update to get the latest state and avoid stale closures.
+      setNodes((currentNodes) => {        
+        const nextNodes = applyNodeChanges(changes, currentNodes);
+
+        changes.forEach(async (change) => {
+          if (change.type === 'position' && !change.dragging && change.position) {
+            // Find the node in the *newly updated* array to get the correct position.
+            const nodeToUpdate = nextNodes.find((n) => n.id === change.id);
+            if (nodeToUpdate) {
+              try {
+                // Only update the position in Firestore.
+                await updateNodeInLesson(lessonId, change.id, { position: nodeToUpdate.position });
+              } catch (error) {
+                console.error('Error updating node position:', error);
+              }
+            }
+          } else if (change.type === 'remove') {
+            // This handles deletion via keyboard (e.g., backspace).
+            try {
+              await deleteNodeFromLesson(lessonId, change.id);
+            } catch (error) {
+              console.error('Error deleting node:', error);
+            }
+          }
+        });
+
+        return nextNodes;
+      });
+    },
+    [lessonId, setNodes]
+  );
+
+  const onEdgesChange = useCallback(
+    (changes) => {
+      setEdges((currentEdges) => {
+        const nextEdges = applyEdgeChanges(changes, currentEdges);
+
+        changes.forEach(async (change) => {
+          if (change.type === 'remove') {
+            try {
+              await deleteEdgeFromLesson(lessonId, change.id);
+            } catch (error) {
+              console.error('Error deleting edge:', error);
+            }
+          }
+        });
+        return nextEdges;
+      });
+    },
+    [lessonId, setEdges]
+  );
+
+  const onConnect = useCallback(
+    async (connection) => {
+      try {
+        // Let the onSnapshot listener handle adding the edge to the state.
+        await addEdgeToLesson(lessonId, connection);
+      } catch (error) {
+        console.error('Error adding edge:', error);
+      }
+    },
+    [lessonId]
+  );
 
   // This callback is passed to the LessonBuilder to update the selected node
   // which in turn determines which sidebar panel to show.
@@ -66,16 +164,27 @@ const LessonDesignerContent = () => {
     setSelectedNode(nodes.length === 1 ? nodes[0] : null);
   }, []);
 
-  // This callback is passed to the InspectorPanel to update node data.
-  const handleNodeUpdate = useCallback((nodeId, data) => {
-    setNodes((nds) =>
-      nds.map((n) =>
-        n.id === nodeId
-          ? { ...n, data }
-          : n
-      )
-    );
-    }, [setNodes]);
+  // This function is now only responsible for persisting the final data.
+  // The inspector component will handle the user input state and decide when to call this.
+  const handleNodeUpdate = useCallback(
+    async (nodeId, data) => {
+      try {
+        await updateNodeInLesson(lessonId, nodeId, { data });
+      } catch (error) {
+        console.error('Error updating node data:', error);
+      }
+    },
+    [lessonId]
+  );
+
+  const handleDeleteNode = useCallback(async (nodeId) => {
+    try {
+      setSelectedNode(null); // Deselect node after deletion
+      await deleteNodeFromLesson(lessonId, nodeId);
+    } catch (error) {
+      console.error('Error deleting node:', error);
+    }
+  }, [lessonId]);
 
     return (
         <div className="flex h-screen w-full bg-gray-100 font-sans">
@@ -86,6 +195,7 @@ const LessonDesignerContent = () => {
                 key={selectedNode.id} // Force re-mount on node change
                 node={selectedNode}
                 onNodeUpdate={handleNodeUpdate}
+                onNodeDelete={handleDeleteNode}
               />
             ) : (
               <NodePalette onAddNode={handleAddNode} />
@@ -99,7 +209,7 @@ const LessonDesignerContent = () => {
               edges={edges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
-              setEdges={setEdges}
+              onConnect={onConnect}
               onSelectionChange={handleSelectionChange}
             />
           </main>
@@ -108,8 +218,6 @@ const LessonDesignerContent = () => {
 };
 
 const LessonDesigner = () => {
-  
-
   return (
     <ReactFlowProvider>
       <LessonDesignerContent />

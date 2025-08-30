@@ -7,15 +7,17 @@ const ChoiceInspector = ({ node, onNodeUpdate }) => {
     setFormData(node.data);
   }, [node.id, node.data]);
 
-  const updateNodeData = (newData) => {
-    onNodeUpdate(node.id, newData);
+  const handlePanelBlur = (e) => {
+    // If the newly focused element is outside this component, then save.
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      onNodeUpdate(node.id, formData);
+    }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedData = { ...formData, [name]: value };
     setFormData(updatedData);
-    updateNodeData(updatedData);
   };
 
   const handleOptionChange = (index, value) => {
@@ -23,25 +25,26 @@ const ChoiceInspector = ({ node, onNodeUpdate }) => {
     newOptions[index] = value;
     const updatedData = { ...formData, options: newOptions };
     setFormData(updatedData);
-    updateNodeData(updatedData);
   };
 
   const addOption = () => {
     const newOptions = [...(formData.options || []), ''];
     const updatedData = { ...formData, options: newOptions };
     setFormData(updatedData);
-    updateNodeData(updatedData);
+    // Persist immediately on structural changes
+    onNodeUpdate(node.id, updatedData);
   };
 
   const removeOption = (index) => {
     const newOptions = (formData.options || []).filter((_, i) => i !== index);
     const updatedData = { ...formData, options: newOptions };
     setFormData(updatedData);
-    updateNodeData(updatedData);
+    // Persist immediately on structural changes
+    onNodeUpdate(node.id, updatedData);
   };
 
   return (
-    <>
+    <div onBlur={handlePanelBlur}>
       <h3 className="text-xl font-semibold mb-4 text-gray-800">Edit: Choice Block</h3>
       <div className="space-y-4">
         <div>
@@ -85,7 +88,7 @@ const ChoiceInspector = ({ node, onNodeUpdate }) => {
           </select>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

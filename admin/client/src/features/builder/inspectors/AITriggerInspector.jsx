@@ -7,19 +7,20 @@ const AITriggerInspector = ({ node, onNodeUpdate }) => {
     setFormData(node.data);
   }, [node.id, node.data]);
 
-  const updateNodeData = (newData) => {
-    onNodeUpdate(node.id, newData);
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const updatedData = { ...formData, [name]: value };
-    setFormData(updatedData);
-    updateNodeData(updatedData);
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePanelBlur = (e) => {
+    // If the newly focused element is outside this component, then save.
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      onNodeUpdate(node.id, formData);
+    }
   };
 
   return (
-    <>
+    <div onBlur={handlePanelBlur}>
       <h3 className="text-xl font-semibold mb-4 text-gray-800">Edit: AI Trigger</h3>
       <div className="space-y-4">
         <div>
@@ -61,7 +62,7 @@ const AITriggerInspector = ({ node, onNodeUpdate }) => {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

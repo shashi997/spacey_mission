@@ -3,21 +3,21 @@ import React, { useState, useEffect } from 'react';
 const QuizInspector = ({ node, onNodeUpdate }) => {
   const [formData, setFormData] = useState(node.data);
 
-  // The key prop on the parent will remount this component when the node changes,
-  // so this effect is mainly for safety in other use cases.
   useEffect(() => {
     setFormData(node.data);
   }, [node.id, node.data]);
 
-  const updateNodeData = (newData) => {
-    onNodeUpdate(node.id, newData);
+  const handlePanelBlur = (e) => {
+    // If the newly focused element is outside this component, then save.
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      onNodeUpdate(node.id, formData);
+    }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedData = { ...formData, [name]: value };
     setFormData(updatedData);
-    updateNodeData(updatedData);
   };
 
   const handleOptionChange = (index, value) => {
@@ -25,27 +25,39 @@ const QuizInspector = ({ node, onNodeUpdate }) => {
     newOptions[index] = value;
     const updatedData = { ...formData, options: newOptions };
     setFormData(updatedData);
-    updateNodeData(updatedData);
   };
 
   const addOption = () => {
     const newOptions = [...(formData.options || []), ''];
     const updatedData = { ...formData, options: newOptions };
     setFormData(updatedData);
-    updateNodeData(updatedData);
+    onNodeUpdate(node.id, updatedData);
   };
 
   const removeOption = (index) => {
     const newOptions = formData.options.filter((_, i) => i !== index);
-    const updatedData = { ...formData, options: newOptions };
+    // Also check if the removed option was the correct answer and clear it if so.
+    const newCorrectAnswer = formData.correctAnswer === formData.options[index] ? '' : formData.correctAnswer;
+    const updatedData = { ...formData, options: newOptions, correctAnswer: newCorrectAnswer };
     setFormData(updatedData);
-    updateNodeData(updatedData);
+    onNodeUpdate(node.id, updatedData);
   };
 
   return (
-    <>
+    <div onBlur={handlePanelBlur}>
       <h3 className="text-xl font-semibold mb-4 text-gray-800">Edit: Quiz Block</h3>
       <div className="space-y-4">
+        <div>
+          <label htmlFor="label" className="block text-sm font-medium text-gray-700">Node Label</label>
+          <input
+            type="text"
+            id="label"
+            name="label"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            value={formData.label || ''}
+            onChange={handleChange}
+          />
+        </div>
         <div>
           <label htmlFor="question" className="block text-sm font-medium text-gray-700">Question</label>
           <input
@@ -90,9 +102,8 @@ const QuizInspector = ({ node, onNodeUpdate }) => {
           </select>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
 export default QuizInspector;
-

@@ -1,10 +1,5 @@
-import React, { useCallback } from 'react';
-import {
-  ReactFlow,
-  Controls,
-  Background,
-  addEdge,
-} from '@xyflow/react';
+import React from 'react';
+import { ReactFlow, Controls, Background } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import NarrationNode from '../nodes/NarrationNode';
 import QuizNode from '../nodes/QuizNode';
@@ -17,7 +12,7 @@ const LessonBuilder = ({
   edges,
   onNodesChange,
   onEdgesChange,
-  setEdges,
+  onConnect,
   onSelectionChange,
 }) => {
   const nodeTypes = {
@@ -27,13 +22,6 @@ const LessonBuilder = ({
     aiTrigger: AITriggerNode,
     gameInteraction: GameInteractionNode,
   };
-  
-  // The onConnect callback is used to add new edges to the state.
-  // It receives the `setEdges` function from the parent component.
-  const onConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)),
-    [setEdges]
-  );
 
   return (
     <ReactFlow
