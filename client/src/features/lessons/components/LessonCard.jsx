@@ -8,9 +8,9 @@ const LessonCard = ({ lesson }) => {
   return (
     <Link
       to={`/dashboard/lessons/${id}`}
-      className="bg-deep-black/80 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden flex flex-col h-full group transition-all duration-300 hover:border-cyan-green/70 hover:shadow-[0_0_25px_rgba(46,243,209,0.3)] hover:-translate-y-2"
+      className="bg-deep-black/80 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden flex flex-col h-full group transition-all duration-300 hover:border-cyan-green/70 hover:shadow-[0_0_25px_rgba(46,243,209,0.3)] hover:-translate-y-2 w-full max-w-sm"
     >
-      <div className="h-48 w-full overflow-hidden">
+      <div className="aspect-video w-full overflow-hidden">
         {iconUrl ? (
           <img
             src={iconUrl}
