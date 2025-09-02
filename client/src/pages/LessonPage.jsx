@@ -7,21 +7,8 @@ import {
   InteractionPanel,
   ChatPanel,
 } from '../features/lesson-player/components';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import { BookOpen, Video } from 'lucide-react';
-
-// A simple media query hook to detect screen size changes
-const useMediaQuery = (query) => {
-  const [matches, setMatches] = useState(window.matchMedia(query).matches);
-
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    const listener = () => setMatches(media.matches);
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, [query]);
-
-  return matches;
-};
 
 const LessonPage = () => {
   const { lessonId } = useParams();
