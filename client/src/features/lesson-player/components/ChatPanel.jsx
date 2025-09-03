@@ -5,6 +5,7 @@ import NarrationBlock from './NarrationBlock';
 import ChoiceBlock from './ChoiceBlock';
 import GameInteractionBlock from './GameInteractionBlock';
 import AITriggerBlock from './AITriggerBlock';
+import QuizBlock from './QuizBlock';
 
 // A map to associate node types with their corresponding components.
 // This makes it easy to add new node types without changing the rendering logic.
@@ -13,7 +14,7 @@ const nodeComponentMap = {
   choice: ChoiceBlock,
   gameInteraction: GameInteractionBlock,
   aiTrigger: AITriggerBlock,
-  // TODO: Add other node types like 'quiz' here.
+  quiz: QuizBlock,
 };
 
 const ChatPanel = () => {
