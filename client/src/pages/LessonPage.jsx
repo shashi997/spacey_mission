@@ -70,7 +70,7 @@ const LessonPage = () => {
         - Desktop: Spans 5 of 10 columns and is ordered to be in the middle.
       */}
       <div className="h-full col-span-2 lg:col-span-5 lg:order-2">
-        <InteractionPanel lesson={lesson} />
+        <InteractionPanel />
       </div>
 
       {/* 

@@ -3,6 +3,7 @@ import { MessageSquare, Send } from 'lucide-react';
 import { useLessonStore } from '../hooks/useLessonStore';
 import NarrationBlock from './NarrationBlock';
 import ChoiceBlock from './ChoiceBlock';
+import GameInteractionBlock from './GameInteractionBlock';
 
 const ChatPanel = () => {
   const history = useLessonStore((state) => state.history);
@@ -34,7 +35,9 @@ const ChatPanel = () => {
         return <NarrationBlock node={node} isActive={isActive} />;
       case 'choice':
         return <ChoiceBlock node={node} isActive={isActive} />;
-      // TODO: Add cases for 'quiz', 'choice', etc.
+      case 'gameInteraction':
+        return <GameInteractionBlock node={node} />;
+      // TODO: Add cases for 'quiz', etc.
       default:
         return (
           <div className="text-center text-gray-500">
