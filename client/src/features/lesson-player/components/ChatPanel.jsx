@@ -1,15 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Send } from 'lucide-react';
 import { useLessonStore } from '../hooks/useLessonStore';
 import NarrationBlock from './NarrationBlock';
 import ChoiceBlock from './ChoiceBlock';
 import GameInteractionBlock from './GameInteractionBlock';
+import AITriggerBlock from './AITriggerBlock';
+
+// A map to associate node types with their corresponding components.
+// This makes it easy to add new node types without changing the rendering logic.
+const nodeComponentMap = {
+  narration: NarrationBlock,
+  choice: ChoiceBlock,
+  gameInteraction: GameInteractionBlock,
+  aiTrigger: AITriggerBlock,
+  // TODO: Add other node types like 'quiz' here.
+};
 
 const ChatPanel = () => {
   const history = useLessonStore((state) => state.history);
   const currentNode = useLessonStore((state) => state.currentNode);
   const [messages, setMessages] = useState([]); // For user messages
   const [inputValue, setInputValue] = useState('');
+  const chatContainerRef = useRef(null);
+
+  // Effect to scroll to the bottom of the chat when new messages or history items are added.
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [history, messages]);
 
   const handleSendMessage = () => {
     if (inputValue.trim()) {
@@ -30,27 +49,30 @@ const ChatPanel = () => {
       );
     }
 
-    switch (node.type) {
-      case 'narration':
-        return <NarrationBlock node={node} isActive={isActive} />;
-      case 'choice':
-        return <ChoiceBlock node={node} isActive={isActive} />;
-      case 'gameInteraction':
-        return <GameInteractionBlock node={node} />;
-      // TODO: Add cases for 'quiz', etc.
-      default:
-        return (
-          <div className="text-center text-gray-500">
-            <p>Unsupported node type: {node.type}</p>
-          </div>
-        );
+    const Component = nodeComponentMap[node.type];
+
+    if (Component) {
+      // For choice blocks, isActive is crucial to enable/disable buttons.
+      // For other blocks, it can be used for styling, like highlighting.
+      return <Component node={node} isActive={isActive} />;
     }
+
+    return (
+      <div className="text-center text-gray-500">
+        <p>Unsupported node type: {node.type}</p>
+      </div>
+    );
   };
 
   return (
     <div className="bg-gray-800/50 p-4 rounded-lg h-full flex flex-col">
       <h2 className="text-lg font-bold text-cyan-green mb-4">Chat Panel</h2>
-      <div className="flex-grow flex flex-col justify-end space-y-4 overflow-y-auto">
+      <div
+        ref={chatContainerRef}
+        className={`flex-grow flex flex-col space-y-4 overflow-y-auto p-2 ${
+          history.length === 0 && !currentNode ? 'justify-center items-center' : 'justify-start'
+        }`}
+      >
         {/* Show initial message if the lesson hasn't started */}
         {history.length === 0 && !currentNode && renderNodeContent(null, false)}
 
@@ -63,8 +85,11 @@ const ChatPanel = () => {
 
         {/* Render user messages */}
         {messages.map((msg) => (
-          <div key={msg.id} className="p-2 rounded-lg bg-blue-500/20 self-end">
-            {msg.text}
+          <div
+            key={msg.id}
+            className="max-w-xs md:max-w-md p-3 rounded-xl bg-blue-600 text-white self-end"
+          >
+             {msg.text}
           </div>
         ))}
       </div>

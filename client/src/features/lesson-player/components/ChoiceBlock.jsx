@@ -45,7 +45,7 @@ const ChoiceBlock = ({ node, isActive }) => {
   };
 
   return (
-    <div className="bg-gray-700/20 border border-gray-600/30 p-4 rounded-lg text-white animate-fade-in">
+    <div className="bg-orange-900/30 border border-orange-700/40 p-4 rounded-lg text-white animate-fade-in">
       {/* Display the prompt */}
       <p className="mb-4 whitespace-pre-wrap">{prompt || 'Choose an option:'}</p>
 
@@ -59,12 +59,12 @@ const ChoiceBlock = ({ node, isActive }) => {
                 key={index}
                 onClick={() => handleOptionClick(optionText, index)}
                 disabled={!isActive}
-                className={`w-full text-left p-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-green ${
+                className={`w-full text-left p-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                   isActive
-                    ? 'bg-blue-600/50 hover:bg-blue-500/70'
+                    ? 'bg-orange-600/50 hover:bg-orange-500/70'
                     : isSelected
                     ? 'bg-green-600/50 ring-2 ring-green-500 cursor-default'
-                    : 'bg-gray-600/30 opacity-70 cursor-not-allowed'
+                    : 'bg-orange-900/20 opacity-70 cursor-not-allowed'
                 }`}
               >
                 {optionText}
