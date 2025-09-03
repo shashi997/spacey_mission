@@ -1,26 +1,64 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { CheckCircle, XCircle, Puzzle } from 'lucide-react';
 import { useGameOutcomeHandler } from '../features/lesson-player/hooks/useGameOutcomeHandler';
+
+const CORRECT_SEQUENCE = [2, 0, 3, 1];
 
 const CircuitRepairDemo = ({ node }) => {
   const handleGameComplete = useGameOutcomeHandler(node);
   const outcomes = node.data.options || [];
-  const successOutcomeText = outcomes.length > 0 ? outcomes[0] : null;
+
+  const [userSequence, setUserSequence] = useState([]);
+  const [status, setStatus] = useState('pending'); // 'pending', 'correct', 'incorrect'
+
+  const handlePanelClick = (index) => {
+    if (status !== 'pending') return;
+
+    const newSequence = [...userSequence, index];
+    setUserSequence(newSequence);
+
+    // Check if the sequence so far is correct
+    if (CORRECT_SEQUENCE[newSequence.length - 1] !== index) {
+      setStatus('incorrect');
+      setTimeout(() => handleGameComplete(outcomes[1] || outcomes[0]), 1500);
+      return;
+    }
+
+    // Check for full sequence completion
+    if (newSequence.length === CORRECT_SEQUENCE.length) {
+      setStatus('correct');
+      setTimeout(() => handleGameComplete(outcomes[0]), 1500);
+    }
+  };
+
+  const getPanelClass = (index) => {
+    if (status === 'correct') return 'bg-green-500';
+    if (status === 'incorrect' && userSequence.includes(index)) return 'bg-red-500';
+    if (userSequence.includes(index)) return 'bg-cyan-500';
+    return 'bg-gray-700 hover:bg-gray-600';
+  };
 
   return (
-    <div className="w-full h-full bg-gray-900 rounded-lg p-4 flex flex-col items-center justify-center gap-4 text-white">
-      <h3 className="text-2xl font-bold text-green-500">Circuit Repair Demo</h3>
-      <p className="text-center">This is a placeholder for the Circuit Repair Demo game.</p>
-      <div className="flex gap-4 mt-4">
-        {successOutcomeText ? (
+    <div className="w-full max-w-md h-full bg-gray-900 rounded-lg p-6 flex flex-col items-center justify-center gap-4 text-white font-sans">
+      <h3 className="text-2xl font-bold text-cyan-400 flex items-center gap-2"><Puzzle /> Circuit Repair</h3>
+      <p className="text-sm text-gray-400">Activate panels in the correct sequence to restore power.</p>
+      
+      <div className="grid grid-cols-2 gap-4 my-4">
+        {[0, 1, 2, 3].map(index => (
           <button
-            onClick={() => handleGameComplete(successOutcomeText)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            key={index}
+            onClick={() => handlePanelClick(index)}
+            disabled={status !== 'pending'}
+            className={`w-24 h-24 rounded-lg text-4xl font-bold transition-colors ${getPanelClass(index)}`}
           >
-            Simulate Success
+            {index + 1}
           </button>
-        ) : (
-          <p className="text-sm text-gray-400">No outcomes defined for this game node.</p>
-        )}
+        ))}
+      </div>
+
+      <div className="h-8 text-xl">
+        {status === 'correct' && <p className="text-green-400 flex items-center gap-2"><CheckCircle /> Circuit Repaired!</p>}
+        {status === 'incorrect' && <p className="text-red-400 flex items-center gap-2"><XCircle /> Power Surge! Try Again.</p>}
       </div>
     </div>
   );
