@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { CheckCircle, XCircle, Puzzle } from 'lucide-react';
 import { useGameOutcomeHandler } from '../features/lesson-player/hooks/useGameOutcomeHandler';
 
@@ -6,10 +6,17 @@ const CORRECT_SEQUENCE = [2, 0, 3, 1];
 
 const CircuitRepairDemo = ({ node }) => {
   const handleGameComplete = useGameOutcomeHandler(node);
-  const outcomes = node.data.options || [];
+  const outcomes = useMemo(() => node.data.options || [], [node.data.options]);
+  const successOutcome = useMemo(() => outcomes.find(o => o.text?.toLowerCase() === 'success'), [outcomes]);
+  const failureOutcome = useMemo(() => outcomes.find(o => o.text?.toLowerCase() === 'failure'), [outcomes]);
 
   const [userSequence, setUserSequence] = useState([]);
   const [status, setStatus] = useState('pending'); // 'pending', 'correct', 'incorrect'
+
+  const handleRetry = () => {
+    setUserSequence([]);
+    setStatus('pending');
+  };
 
   const handlePanelClick = (index) => {
     if (status !== 'pending') return;
@@ -20,14 +27,13 @@ const CircuitRepairDemo = ({ node }) => {
     // Check if the sequence so far is correct
     if (CORRECT_SEQUENCE[newSequence.length - 1] !== index) {
       setStatus('incorrect');
-      setTimeout(() => handleGameComplete(outcomes[1] || outcomes[0]), 1500);
       return;
     }
 
     // Check for full sequence completion
     if (newSequence.length === CORRECT_SEQUENCE.length) {
       setStatus('correct');
-      setTimeout(() => handleGameComplete(outcomes[0]), 1500);
+      setTimeout(() => handleGameComplete(successOutcome), 1500);
     }
   };
 
@@ -56,9 +62,24 @@ const CircuitRepairDemo = ({ node }) => {
         ))}
       </div>
 
-      <div className="h-8 text-xl">
+      <div className="h-8 text-xl flex items-center justify-center">
         {status === 'correct' && <p className="text-green-400 flex items-center gap-2"><CheckCircle /> Circuit Repaired!</p>}
         {status === 'incorrect' && <p className="text-red-400 flex items-center gap-2"><XCircle /> Power Surge! Try Again.</p>}
+      </div>
+
+      <div className="h-12">
+        {status === 'incorrect' && (
+          <div className="flex gap-4 mt-2">
+            <button onClick={handleRetry} className="bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors">Retry</button>
+            <button
+              onClick={() => handleGameComplete(failureOutcome)}
+              disabled={!failureOutcome}
+              className="bg-red-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-800 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+            >
+              Accept Failure
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

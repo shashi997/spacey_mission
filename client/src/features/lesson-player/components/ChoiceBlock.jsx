@@ -33,12 +33,16 @@ const ChoiceBlock = ({ node, isActive }) => {
 
   const { prompt, options, uiStyle = 'buttons' } = node.data;
 
-  // Handler for when a user clicks an option.
-  // It calls advanceLesson with the index of the option as the sourceHandle.
-  const handleOptionClick = (optionText, optionIndex) => {
+  /**
+   * Handler for when a user clicks an option.
+   * It calls advanceLesson with a sourceHandle derived from the option's unique ID.
+   * @param {object} option - The selected option object, containing id and text.
+   * @param {number} optionIndex - The index of the selected option.
+   */
+  const handleOptionClick = (option, optionIndex) => {
     if (isActive) {
-      // The sourceHandle format from the database is "choice-index-kebab-case-text"
-      const sourceHandle = `choice-${optionIndex}-${toKebabCase(optionText)}`;
+      // The sourceHandle format is derived from the node type and output handle ID in the builder.
+      const sourceHandle = `${node.type}-out-${option.id}`;
       recordAnswer(node.id, optionIndex);
       advanceLesson(sourceHandle);
     }
@@ -46,18 +50,15 @@ const ChoiceBlock = ({ node, isActive }) => {
 
   return (
     <div className="bg-orange-900/30 border border-orange-700/40 p-4 rounded-lg text-white animate-fade-in">
-      {/* Display the prompt */}
       <p className="mb-4 whitespace-pre-wrap">{prompt || 'Choose an option:'}</p>
-
-      {/* Render the options based on the uiStyle */}
       {uiStyle === 'buttons' && (
         <div className="flex flex-col space-y-2">
-          {options?.map((optionText, index) => {
+          {options?.map((option, index) => {
             const isSelected = selectedOptionIndex === index;
             return (
               <button
-                key={index}
-                onClick={() => handleOptionClick(optionText, index)}
+                key={option.id || index}
+                onClick={() => handleOptionClick(option, index)}
                 disabled={!isActive}
                 className={`w-full text-left p-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                   isActive
@@ -67,7 +68,7 @@ const ChoiceBlock = ({ node, isActive }) => {
                     : 'bg-orange-900/20 opacity-70 cursor-not-allowed'
                 }`}
               >
-                {optionText}
+                {option.text}
               </button>
             );
           })}

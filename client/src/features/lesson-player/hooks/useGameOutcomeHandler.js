@@ -20,20 +20,24 @@ export const useGameOutcomeHandler = (node) => {
   // Read from `options` first, with a fallback to `outcomes` for compatibility.
   const outcomes = node.data.options || node.data.outcomes || [];
 
-  const handleGameComplete = (outcomeText) => {
-    if (!outcomeText) {
+  const handleGameComplete = (outcome) => {
+    if (!outcome) {
       console.error('handleGameComplete called with an empty outcome.');
       return;
     }
 
-    const outcomeIndex = outcomes.findIndex((o) => o.toLowerCase() === outcomeText.toLowerCase());
+    let sourceHandle;
 
-    if (outcomeIndex === -1) {
-      console.error(`Outcome "${outcomeText}" not found in node.data.options/outcomes:`, outcomes);
-      return;
+    if (typeof outcome === 'string') {
+      // Legacy support for string arrays
+      const outcomeIndex = outcomes.findIndex((o) => o.toLowerCase() === outcome.toLowerCase());
+      sourceHandle = `game-outcome-${outcomeIndex}-${toKebabCase(outcome)}`;
+    } else {
+      // New format: array of objects with id and text.
+      // The sourceHandle format is derived from the handle group and output ID in the builder.
+      sourceHandle = `game-outcome-${outcome.id}`;
     }
 
-    const sourceHandle = `game-outcome-${outcomeIndex}-${toKebabCase(outcomeText)}`;
     advanceLesson(sourceHandle);
   };
 

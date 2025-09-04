@@ -13,55 +13,55 @@ const getSystemIcon = (systemName = '') => {
 
 const ResourceAllocationDemo = ({ node }) => {
   const handleGameComplete = useGameOutcomeHandler(node);
-  const systems = node.data.options || []; // The possible outcomes are our systems
+  const systems = node.data.options || [];
 
   const TOTAL_POWER = 10;
   const [powerUnits, setPowerUnits] = useState(TOTAL_POWER);
   const [allocations, setAllocations] = useState(() => {
-    // Initialize allocations for each system to 0
     const initial = {};
+    // Use system.text as the key, since system is an object
     systems.forEach(system => {
-      initial[system] = 0;
+      initial[system.text] = 0;
     });
     return initial;
   });
 
   // Handler to add power to a system
-  const handleAddPower = (system) => {
+  const handleAddPower = (systemText) => {
     if (powerUnits > 0) {
       setPowerUnits(prev => prev - 1);
-      setAllocations(prev => ({ ...prev, [system]: prev[system] + 1 }));
+      setAllocations(prev => ({ ...prev, [systemText]: prev[systemText] + 1 }));
     }
   };
 
   // Handler to remove power from a system
-  const handleRemovePower = (system) => {
-    if (allocations[system] > 0) {
+  const handleRemovePower = (systemText) => {
+    if (allocations[systemText] > 0) {
       setPowerUnits(prev => prev + 1);
-      setAllocations(prev => ({ ...prev, [system]: prev[system] - 1 }));
+      setAllocations(prev => ({ ...prev, [systemText]: prev[systemText] - 1 }));
     }
   };
 
   // Handler to finalize the decision
   const handleFinalize = () => {
     if (powerUnits > 0) {
-      // This button should be disabled, but as a safeguard
       alert("You must allocate all power units before finalizing.");
       return;
     }
 
     // Find the system with the highest power allocation
-    let chosenSystem = systems[0];
-    let maxPower = 0;
-    for (const system in allocations) {
-      if (allocations[system] > maxPower) {
-        maxPower = allocations[system];
-        chosenSystem = system;
+    let chosenSystemText = systems[0]?.text;
+    let maxPower = -1; // Start with -1 to correctly handle 0 allocations
+    for (const systemText in allocations) {
+      if (allocations[systemText] > maxPower) {
+        maxPower = allocations[systemText];
+        chosenSystemText = systemText;
       }
     }
 
     // Advance the lesson with the chosen outcome
-    handleGameComplete(chosenSystem);
+    const chosenOutcome = systems.find(s => s.text === chosenSystemText) || systems[0];
+    handleGameComplete(chosenOutcome);
   };
 
   return (
@@ -76,22 +76,22 @@ const ResourceAllocationDemo = ({ node }) => {
 
       <div className="w-full space-y-3 mt-4">
         {systems.map(system => (
-          <div key={system} className="bg-gray-800/50 p-3 rounded-lg flex items-center justify-between">
+          <div key={system.id || system.text} className="bg-gray-800/50 p-3 rounded-lg flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {getSystemIcon(system)}
-              <span className="font-medium">{system}</span>
+              {getSystemIcon(system.text)}
+              <span className="font-medium">{system.text}</span>
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => handleRemovePower(system)}
+                onClick={() => handleRemovePower(system.text)}
                 className="bg-red-600 hover:bg-red-700 rounded-full h-8 w-8 text-white font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={allocations[system] === 0}
+                disabled={allocations[system.text] === 0}
               >
                 -
               </button>
-              <span className="text-xl font-mono w-8 text-center">{allocations[system]}</span>
+              <span className="text-xl font-mono w-8 text-center">{allocations[system.text]}</span>
               <button
-                onClick={() => handleAddPower(system)}
+                onClick={() => handleAddPower(system.text)}
                 className="bg-green-600 hover:bg-green-700 rounded-full h-8 w-8 text-white font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={powerUnits === 0}
               >

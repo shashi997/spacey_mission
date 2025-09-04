@@ -78,8 +78,8 @@ const ChatPanel = () => {
         {history.length === 0 && !currentNode && renderNodeContent(null, false)}
 
         {/* Render lesson history */}
-        {history.map((node) => (
-          <div key={node.id} className="self-start w-full">
+        {history.map((node, index) => (
+          <div key={`${node.id}-${index}`} className="self-start w-full">
             {renderNodeContent(node, node.id === currentNode?.id)}
           </div>
         ))}

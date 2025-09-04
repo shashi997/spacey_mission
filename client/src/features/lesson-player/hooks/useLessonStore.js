@@ -53,19 +53,34 @@ const lessonStore = (set, get) => ({
     const { lesson, currentNode } = get();
     if (!lesson || !currentNode) return;
 
-    // Find the edge originating from the current node
-    const edge = lesson.edges.find(
-      (e) =>
-        e.source === currentNode.id &&
-        // Use loose equality to handle string vs. number from data source
-        // and check for null/undefined to correctly handle sourceHandle '0'.
-        (sourceHandle != null ? e.sourceHandle == sourceHandle : e.sourceHandle == null),
-    );
+    let edge;
+
+    if (sourceHandle !== null) {
+      // If a specific sourceHandle is provided, find that exact edge.
+      // Use loose equality for sourceHandle to accommodate different data types.
+      edge = lesson.edges.find(
+        (e) => e.source === currentNode.id && e.sourceHandle == sourceHandle,
+      );
+    } else {
+      // If no sourceHandle is provided, we have a couple of strategies.
+      const outgoingEdges = lesson.edges.filter((e) => e.source === currentNode.id);
+
+      // 1. Prefer an edge that explicitly has no sourceHandle.
+      edge = outgoingEdges.find((e) => e.sourceHandle == null);
+
+      // 2. If no such edge exists, but there is only ONE outgoing edge,
+      //    we assume it's the correct one, regardless of its sourceHandle.
+      //    This makes single-exit nodes like Narration or Quiz more robust.
+      if (!edge && outgoingEdges.length === 1) {
+        edge = outgoingEdges[0];
+      }
+    }
+
     if (edge) {
       get().setCurrentNode(edge.target);
     } else {
       // Handle lesson end or nodes with no outgoing path
-      console.warn(`Lesson ended or no outgoing edge found for sourceHandle: ${sourceHandle}.`);
+      console.warn(`Lesson ended or no outgoing edge found for sourceHandle: ${sourceHandle} from node ${currentNode.id}.`);
       set({ currentNode: null }); // Or set some 'finished' state
     }
   },
