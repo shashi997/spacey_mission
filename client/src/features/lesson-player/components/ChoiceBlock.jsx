@@ -1,5 +1,7 @@
 import React from 'react';
 import { useLessonStore } from '../hooks/useLessonStore';
+import useSound from 'use-sound';
+import choiceSound from '../../../assets/sounds/Button02.wav';
 
 /**
  * Converts a string to kebab-case.
@@ -21,6 +23,7 @@ const toKebabCase = (text) => {
  * @param {{ node: Object, isActive: boolean }} props
  */
 const ChoiceBlock = ({ node, isActive }) => {
+  const [playChoice] = useSound(choiceSound, { volume: 0.25 });
   const advanceLesson = useLessonStore((state) => state.advanceLesson);
   const recordAnswer = useLessonStore((state) => state.recordAnswer);
   const selectedOptionIndex = useLessonStore((state) =>
@@ -41,6 +44,7 @@ const ChoiceBlock = ({ node, isActive }) => {
    */
   const handleOptionClick = (option, optionIndex) => {
     if (isActive) {
+      playChoice();
       // The sourceHandle format is derived from the node type and output handle ID in the builder.
       const sourceHandle = `${node.type}-out-${option.id}`;
       recordAnswer(node.id, optionIndex);

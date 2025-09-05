@@ -1,5 +1,7 @@
 import React from 'react';
 import { useLessonStore } from '../hooks/useLessonStore';
+import useSound from 'use-sound';
+import buttonSound from '../../../assets/sounds/Button01.wav';
 
 /**
  * Renders a narration block in the chat panel.
@@ -8,6 +10,7 @@ import { useLessonStore } from '../hooks/useLessonStore';
  */
 const NarrationBlock = ({ node, isActive }) => {
   const advanceLesson = useLessonStore((state) => state.advanceLesson);
+  const [play] = useSound(buttonSound, { volume: 0.25 });
 
   if (!node || !node.data) {
     return null;
@@ -22,7 +25,10 @@ const NarrationBlock = ({ node, isActive }) => {
       {isActive && (
         <div className="flex justify-end">
           <button
-            onClick={() => advanceLesson()}
+            onClick={() => {
+              play();
+              advanceLesson();
+            }}
             className="bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors"
           >
             Continue

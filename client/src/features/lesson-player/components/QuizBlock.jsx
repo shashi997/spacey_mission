@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useLessonStore } from '../hooks/useLessonStore';
 import { CheckCircle, XCircle } from 'lucide-react';
+import useSound from 'use-sound';
+import correctSound from '../../../assets/sounds/Button02.wav';
 
 /**
  * Renders a quiz block in the chat panel.
@@ -8,6 +10,7 @@ import { CheckCircle, XCircle } from 'lucide-react';
  * @param {{ node: Object, isActive: boolean }} props
  */
 const QuizBlock = ({ node, isActive }) => {
+  const [playCorrect] = useSound(correctSound, { volume: 0.25 });
   const recordAnswer = useLessonStore((state) => state.recordAnswer);
   const advanceLesson = useLessonStore((state) => state.advanceLesson);
   const userAnswer = useLessonStore((state) => state.userAnswers.get(node.id));
@@ -25,6 +28,9 @@ const QuizBlock = ({ node, isActive }) => {
   const handleSelectAnswer = (option) => { // option is an object {id, text, correct}
     if (isAnswered) return;
 
+    if (option.correct) {
+      playCorrect();
+    }
     setSelectedAnswer(option.text);
     recordAnswer(node.id, option.text);
   };
@@ -76,6 +82,9 @@ const QuizBlock = ({ node, isActive }) => {
           <button
             onClick={() => {
               const isCorrect = (selectedAnswer || userAnswer) === correctAnswer;
+              if (isCorrect) {
+                playCorrect();
+              }
               const sourceHandle = isCorrect ? 'correct' : 'incorrect';
               advanceLesson(sourceHandle);
             }}
