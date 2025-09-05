@@ -8,7 +8,7 @@ const CircuitRepairDemo = ({ node }) => {
   const handleGameComplete = useGameOutcomeHandler(node);
   const outcomes = useMemo(() => node.data.options || [], [node.data.options]);
   const successOutcome = useMemo(() => outcomes.find(o => o.text?.toLowerCase() === 'success'), [outcomes]);
-  const failureOutcome = useMemo(() => outcomes.find(o => o.text?.toLowerCase() === 'failure'), [outcomes]);
+  // Failure outcome is removed as it's not configured in the node data.
 
   const [userSequence, setUserSequence] = useState([]);
   const [status, setStatus] = useState('pending'); // 'pending', 'correct', 'incorrect'
@@ -69,15 +69,8 @@ const CircuitRepairDemo = ({ node }) => {
 
       <div className="h-12">
         {status === 'incorrect' && (
-          <div className="flex gap-4 mt-2">
+          <div className="flex justify-center mt-2">
             <button onClick={handleRetry} className="bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors">Retry</button>
-            <button
-              onClick={() => handleGameComplete(failureOutcome)}
-              disabled={!failureOutcome}
-              className="bg-red-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-800 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
-            >
-              Accept Failure
-            </button>
           </div>
         )}
       </div>
