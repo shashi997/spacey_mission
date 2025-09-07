@@ -1,0 +1,7 @@
+pydantic
+fastapi
+uvicorn
+langchain_core
+dotenv
+langchain
+langchain_groq
