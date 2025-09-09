@@ -6,6 +6,8 @@ import ResourceAllocationDemo from './ResourceAllocationDemo';
 import OutcomeDemo from './OutcomeDemo'; 
 import PlanetSequencer from './PlanetSequencer';
 import GravityWellDemo from './GravityWellDemo';
+import SatelliteBuilderDemo from './SatelliteBuilderDemo';
+import RocketStackerDemo from './RocketStackerDemo';
 
 export const GameRegistry = {
   solar_flare_demo: SolarFlareDemo,
@@ -16,5 +18,7 @@ export const GameRegistry = {
   outcome_demo: OutcomeDemo,
   planet_sequencer: PlanetSequencer,
   gravity_well: GravityWellDemo, 
+  satellite_builder: SatelliteBuilderDemo,
+  rocket_stacker: RocketStackerDemo,
   // Add other games here
 };
