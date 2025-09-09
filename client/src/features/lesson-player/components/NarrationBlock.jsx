@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLessonStore } from '../hooks/useLessonStore';
 import useSound from 'use-sound';
 import buttonSound from '../../../assets/sounds/Button01.wav';
+import { speak, cancelSpeech } from '../services/ttsService';
 
 /**
  * Renders a narration block in the chat panel.
- * It displays text and provides a button to continue to the next lesson node.
+ * It displays text, plays narration, and provides a button to continue.
  * @param {{ node: Object, isActive: boolean }} props
  */
 const NarrationBlock = ({ node, isActive }) => {
@@ -16,8 +17,28 @@ const NarrationBlock = ({ node, isActive }) => {
     return null;
   }
 
-  // Assuming narration text is stored in node.data.text
   const narrationText = node.data.text || 'No narration content available.';
+
+  useEffect(() => {
+    if (isActive && narrationText) {
+      speak(narrationText);
+    }
+
+    // Cleanup function to stop speech when the component is no longer active or unmounts
+    return () => {
+      cancelSpeech();
+    };
+  }, [isActive, narrationText]);
+
+  const handleContinue = () => {
+    play();
+    // This is a workaround for some browsers (like Firefox) that prevent audio
+    // from playing without a recent user gesture. Calling cancel() inside a
+    // click handler helps "unlock" the speech synthesis engine for the next
+    // utterance that will be triggered by `advanceLesson()`.
+    cancelSpeech();
+    advanceLesson();
+  };
 
   return (
     <div className="bg-blue-800/30 border border-blue-600/40 p-4 rounded-lg text-white animate-fade-in">
@@ -25,10 +46,7 @@ const NarrationBlock = ({ node, isActive }) => {
       {isActive && (
         <div className="flex justify-end">
           <button
-            onClick={() => {
-              play();
-              advanceLesson();
-            }}
+            onClick={handleContinue}
             className="bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors"
           >
             Continue

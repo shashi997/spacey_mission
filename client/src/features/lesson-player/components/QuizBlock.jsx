@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useLessonStore } from '../hooks/useLessonStore';
 import { CheckCircle, XCircle } from 'lucide-react';
 import useSound from 'use-sound';
 import correctSound from '../../../assets/sounds/Button02.wav';
+import { speak, cancelSpeech } from '../services/ttsService';
 
 /**
  * Renders a quiz block in the chat panel.
@@ -24,6 +25,34 @@ const QuizBlock = ({ node, isActive }) => {
 
   const { question, answers: options } = node.data;
   const correctAnswer = useMemo(() => options?.find(o => o.correct)?.text, [options]);
+
+  useEffect(() => {
+    // Only speak when the block is active and hasn't been answered yet.
+    if (isActive && !isAnswered) {
+      const optionTexts = options?.map(o => o.text).filter(Boolean) || [];
+      let optionsSpeech = '';
+
+      if (optionTexts.length > 0) {
+        if (optionTexts.length === 1) {
+          optionsSpeech = optionTexts[0];
+        } else {
+          // Creates a more natural-sounding list like "A, B, or C"
+          const lastOption = optionTexts.pop();
+          optionsSpeech = `${optionTexts.join(', ')}, or ${lastOption}`;
+        }
+      }
+
+      // Combine question and options with a good pause in between.
+      const textToSpeak = [question, optionsSpeech].filter(Boolean).join('... ');
+
+      if (textToSpeak) {
+        speak(textToSpeak);
+      }
+    }
+
+    // Cleanup function to stop speech when the component is no longer active or unmounts
+    return () => cancelSpeech();
+  }, [isActive, isAnswered, question, options]);
 
   const handleSelectAnswer = (option) => { // option is an object {id, text, correct}
     if (isAnswered) return;
@@ -85,6 +114,7 @@ const QuizBlock = ({ node, isActive }) => {
               if (isCorrect) {
                 playCorrect();
               }
+              cancelSpeech();
               const sourceHandle = isCorrect ? 'correct' : 'incorrect';
               advanceLesson(sourceHandle);
             }}

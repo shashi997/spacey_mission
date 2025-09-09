@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLessonStore } from '../hooks/useLessonStore';
 import useSound from 'use-sound';
 import choiceSound from '../../../assets/sounds/Button02.wav';
+import { speak, cancelSpeech } from '../services/ttsService';
 
 /**
  * Converts a string to kebab-case.
@@ -36,6 +37,36 @@ const ChoiceBlock = ({ node, isActive }) => {
 
   const { prompt, options, uiStyle = 'buttons' } = node.data;
 
+  useEffect(() => {
+    if (isActive) {
+      const optionTexts = options?.map(o => o.text).filter(Boolean) || [];
+      let optionsSpeech = '';
+
+      if (optionTexts.length > 0) {
+        if (optionTexts.length === 1) {
+          optionsSpeech = optionTexts[0];
+        } else {
+          // Creates a more natural-sounding list like "A, B, or C"
+          const lastOption = optionTexts.pop();
+          optionsSpeech = `${optionTexts.join(', ')}, or ${lastOption}`;
+        }
+      }
+
+      // Combine prompt and options with a good pause in between.
+      // An ellipsis '...' is often spoken as a longer pause than a period.
+      const textToSpeak = [prompt, optionsSpeech].filter(Boolean).join('... ');
+
+      if (textToSpeak) {
+        speak(textToSpeak);
+      }
+    }
+
+    // Cleanup function to stop speech when the component is no longer active or unmounts
+    return () => {
+      cancelSpeech();
+    };
+  }, [isActive, prompt, options]);
+
   /**
    * Handler for when a user clicks an option.
    * It calls advanceLesson with a sourceHandle derived from the option's unique ID.
@@ -45,6 +76,9 @@ const ChoiceBlock = ({ node, isActive }) => {
   const handleOptionClick = (option, optionIndex) => {
     if (isActive) {
       playChoice();
+      // From NarrationBlock: calling cancel() inside a click handler helps "unlock"
+      // the speech synthesis engine for the next utterance.
+      cancelSpeech();
       // The sourceHandle format is derived from the node type and output handle ID in the builder.
       const sourceHandle = `${node.type}-out-${option.id}`;
       recordAnswer(node.id, optionIndex);
