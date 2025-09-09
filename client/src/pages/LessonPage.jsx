@@ -69,9 +69,9 @@ const LessonPage = () => {
         - Mobile/Tablet: Spans 2 columns, making it a full-width top row.
         - Desktop: Spans 5 of 10 columns and is ordered to be in the middle.
       */}
-      <div className="h-full col-span-2 lg:col-span-5 lg:order-2">
-        <InteractionPanel />
-      </div>
+        <div className="h-full col-span-2 lg:col-span-5 lg:order-2 overflow-y-auto">
+          <InteractionPanel />
+        </div>
 
       {/* 
         Left Column: Outline + Webcam
