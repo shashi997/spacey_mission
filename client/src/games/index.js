@@ -8,6 +8,7 @@ import PlanetSequencer from './PlanetSequencer';
 import GravityWellDemo from './GravityWellDemo';
 import SatelliteBuilderDemo from './SatelliteBuilderDemo';
 import RocketStackerDemo from './RocketStackerDemo';
+import LunarLanderDemo from './LunarLanderDemo';
 
 export const GameRegistry = {
   solar_flare_demo: SolarFlareDemo,
@@ -20,5 +21,6 @@ export const GameRegistry = {
   gravity_well: GravityWellDemo, 
   satellite_builder: SatelliteBuilderDemo,
   rocket_stacker: RocketStackerDemo,
+  lunar_lander: LunarLanderDemo,
   // Add other games here
 };
