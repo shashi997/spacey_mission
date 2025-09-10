@@ -9,6 +9,8 @@ import GravityWellDemo from './GravityWellDemo';
 import SatelliteBuilderDemo from './SatelliteBuilderDemo';
 import RocketStackerDemo from './RocketStackerDemo';
 import LunarLanderDemo from './LunarLanderDemo';
+import SystemCheckDemo from './SystemCheckDemo';
+import RoverPowerGridDemo from './RoverPowerGridDemo';
 
 export const GameRegistry = {
   solar_flare_demo: SolarFlareDemo,
@@ -22,5 +24,7 @@ export const GameRegistry = {
   satellite_builder: SatelliteBuilderDemo,
   rocket_stacker: RocketStackerDemo,
   lunar_lander: LunarLanderDemo,
+  system_check_demo: SystemCheckDemo,
+  rover_power_grid_demo: RoverPowerGridDemo,
   // Add other games here
 };
