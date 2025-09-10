@@ -11,6 +11,8 @@ import RocketStackerDemo from './RocketStackerDemo';
 import LunarLanderDemo from './LunarLanderDemo';
 import SystemCheckDemo from './SystemCheckDemo';
 import RoverPowerGridDemo from './RoverPowerGridDemo';
+import BasePowerGridDemo from './BasePowerGridDemo';
+import StructuralReinforcementDemo from './StructuralReinforcementDemo';
 
 export const GameRegistry = {
   solar_flare_demo: SolarFlareDemo,
@@ -26,5 +28,9 @@ export const GameRegistry = {
   lunar_lander: LunarLanderDemo,
   system_check_demo: SystemCheckDemo,
   rover_power_grid_demo: RoverPowerGridDemo,
+  base_power_grid_demo: BasePowerGridDemo,
+  base_power: BasePowerGridDemo, // Alias for lesson compatibility
+  structural_reinforcement_demo: StructuralReinforcementDemo,
+  structural_reinforcement: StructuralReinforcementDemo, // Alias for lesson compatibility
   // Add other games here
 };
