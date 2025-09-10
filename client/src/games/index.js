@@ -9,6 +9,8 @@ import GravityWellDemo from './GravityWellDemo';
 import SatelliteBuilderDemo from './SatelliteBuilderDemo';
 import RocketStackerDemo from './RocketStackerDemo';
 import LunarLanderDemo from './LunarLanderDemo';
+import TransitLightCurveDemo from './TransitLightCurveDemo';
+import ProbeTrajectoryPlotter from './ProbeTrajectoryPlotter';
 
 export const GameRegistry = {
   solar_flare_demo: SolarFlareDemo,
@@ -22,5 +24,7 @@ export const GameRegistry = {
   satellite_builder: SatelliteBuilderDemo,
   rocket_stacker: RocketStackerDemo,
   lunar_lander: LunarLanderDemo,
+  transit_light: TransitLightCurveDemo,
+  probe_trajectory: ProbeTrajectoryPlotter,
   // Add other games here
 };
