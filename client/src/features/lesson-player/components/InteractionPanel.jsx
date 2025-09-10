@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLessonStore } from '../hooks/useLessonStore';
 import { GameRegistry } from '../../../games';
+import NarrationMedia from './NarrationMedia';
 
 const InteractionPanel = () => {
   const currentNode = useLessonStore((state) => state.currentNode);
@@ -12,6 +13,10 @@ const InteractionPanel = () => {
         return <GameComponent node={currentNode} />;
       }
       return <p>Game '{currentNode.data.game_id}' not found in registry.</p>;
+    }
+
+    if (currentNode?.type === 'narration' && currentNode.data.imageUrl) {
+      return <NarrationMedia node={currentNode} />;
     }
 
     return <p>Content for the current lesson node will be rendered here.</p>;
