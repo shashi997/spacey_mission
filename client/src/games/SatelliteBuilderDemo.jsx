@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { CheckCircle, XCircle, RefreshCw, Satellite } from 'lucide-react';
 import { useGameOutcomeHandler } from '../features/lesson-player/hooks/useGameOutcomeHandler';
 
 // Example images for each option
@@ -27,19 +27,24 @@ export default function SatelliteBuilderDemo({ node }) {
     tool: null,
     comms: null,
   });
-  // Adopted the status state machine from PlanetSequencer
   const [status, setStatus] = useState('pending'); // 'pending', 'correct', 'incorrect'
+  const timeoutRef = useRef(null);
 
   const handleGameComplete = useGameOutcomeHandler(node);
+
+  // Cleanup timeout on unmount to prevent race conditions
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
 
   // Outcomes from LessonBuilder (Success/Failure)
   const outcomes = useMemo(() => node.data.options || [], [node.data.options]);
   const successOutcome = useMemo(
-    () => outcomes.find((o) => o.label?.toLowerCase() === 'success'),
+    () => outcomes.find((o) => o.text?.toLowerCase() === 'success'),
     [outcomes]
   );
   const failureOutcome = useMemo(
-    () => outcomes.find((o) => o.label?.toLowerCase() === 'failure'),
+    () => outcomes.find((o) => o.text?.toLowerCase() === 'failure'),
     [outcomes]
   );
 
@@ -61,7 +66,7 @@ export default function SatelliteBuilderDemo({ node }) {
       setStatus('correct');
       if (successOutcome) {
         // Add a delay for UX, just like PlanetSequencer
-        setTimeout(() => handleGameComplete(successOutcome), 1500);
+        timeoutRef.current = setTimeout(() => handleGameComplete(successOutcome), 1500);
       } else {
         console.warn('No success outcome defined in lesson JSON');
       }
@@ -69,7 +74,7 @@ export default function SatelliteBuilderDemo({ node }) {
       setStatus('incorrect');
       // If a failure branch exists in the lesson, we still use it
       if (failureOutcome) {
-        setTimeout(() => handleGameComplete(failureOutcome), 1500);
+        timeoutRef.current = setTimeout(() => handleGameComplete(failureOutcome), 1500);
       }
     }
   };
@@ -83,7 +88,9 @@ export default function SatelliteBuilderDemo({ node }) {
 
   return (
     <div className="p-6 bg-gray-900 text-white rounded-2xl shadow-lg space-y-6">
-      <h2 className="text-2xl font-bold text-yellow-400">🛰️ Satellite Builder</h2>
+      <h2 className="text-2xl font-bold text-yellow-400 flex items-center gap-2">
+        <Satellite /> Satellite Builder
+      </h2>
       <p className="text-gray-300">
         Your mission is to build a satellite that can monitor hurricanes on Earth.
         <br />
