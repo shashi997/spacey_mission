@@ -11,6 +11,9 @@ import RocketStackerDemo from './RocketStackerDemo';
 import LunarLanderDemo from './LunarLanderDemo';
 import TransitLightCurveDemo from './TransitLightCurveDemo';
 import ProbeTrajectoryPlotter from './ProbeTrajectoryPlotter';
+import AtmosphericSpectrometer from './AtmosphericSpectrometer';
+import CrewSelectionDemo from './CrewSelectionDemo';
+import OutpostBlueprintDesigner from './OutpostBlueprintDesigner';
 
 export const GameRegistry = {
   solar_flare_demo: SolarFlareDemo,
@@ -26,5 +29,8 @@ export const GameRegistry = {
   lunar_lander: LunarLanderDemo,
   transit_light: TransitLightCurveDemo,
   probe_trajectory: ProbeTrajectoryPlotter,
+  atmo_spec: AtmosphericSpectrometer,
+  crew_selection: CrewSelectionDemo,
+  outpost_blueprint: OutpostBlueprintDesigner, 
   // Add other games here
 };
