@@ -6,16 +6,16 @@ const InteractionPanel = () => {
   const currentNode = useLessonStore((state) => state.currentNode);
 
   // DEBUG: Log current node information
-  console.log('InteractionPanel - Current Node:', currentNode);
-  console.log('InteractionPanel - Node Type:', currentNode?.type);
-  console.log('InteractionPanel - Game ID:', currentNode?.data?.game_id);
+  // console.log('InteractionPanel - Current Node:', currentNode);
+  // console.log('InteractionPanel - Node Type:', currentNode?.type);
+  // console.log('InteractionPanel - Game ID:', currentNode?.data?.game_id);
 
   const renderContent = () => {
     if (currentNode?.type === 'gameInteraction') {
       const GameComponent = GameRegistry[currentNode.data.game_id];
-      console.log('Looking for game:', currentNode.data.game_id);
-      console.log('Found component:', GameComponent);
-      console.log('Available games:', Object.keys(GameRegistry));
+      // console.log('Looking for game:', currentNode.data.game_id);
+      // console.log('Found component:', GameComponent);
+      // console.log('Available games:', Object.keys(GameRegistry));
       
       if (GameComponent) {
         return <GameComponent node={currentNode} />;
