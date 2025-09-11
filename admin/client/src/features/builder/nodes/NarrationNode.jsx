@@ -2,7 +2,7 @@ import React from 'react';
 import { Handle, Position } from '@xyflow/react';
 
 const NarrationNode = ({ data }) => {
-  const { label, text, inputs = [], outputs = [] } = data;
+  const { label, text, imageUrl, inputs = [], outputs = [] } = data;
 
   return (
     <div className="p-4 border-2 border-gray-400 rounded-md bg-white shadow-lg w-72">
@@ -19,6 +19,11 @@ const NarrationNode = ({ data }) => {
       ))}
 
       <div className="font-bold text-gray-800 mb-2">{label || 'Narration'}</div>
+      {imageUrl && (
+        <div className="mb-2">
+          <img src={imageUrl} alt={label || 'Narration image'} className="w-full h-auto rounded-md object-cover" />
+        </div>
+      )}
       <p className="text-sm text-gray-600 whitespace-pre-wrap break-words">{text || 'No text set.'}</p>
 
       {/* Dynamic output handles */}

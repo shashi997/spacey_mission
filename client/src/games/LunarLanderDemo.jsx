@@ -28,25 +28,27 @@ const LunarLanderDemo = ({ node }) => {
   const [landerState, setLanderState] = useState(getInitialState);
   const keysPressed = useRef({ up: false, left: false, right: false });
   const gameLoopRef = useRef();
+  const timeoutRef = useRef(null);
 
   const handleGameComplete = useGameOutcomeHandler(node);
 
   // Memoize outcomes from lesson data for performance
-  const outcomes = useMemo(() => node.data?.options || [], [node.data]);
-  const successOutcome = useMemo(() => outcomes.find(o => o.label?.toLowerCase() === 'success'), [outcomes]);
-  const failureOutcome = useMemo(() => outcomes.find(o => o.label?.toLowerCase() === 'failure'), [outcomes]);
+  const outcomes = useMemo(() => node.data?.options || [], [node.data?.options]);
+  const successOutcome = useMemo(() => outcomes.find(o => o.text?.toLowerCase() === 'success'), [outcomes]);
+  // As there is no failure outcome in the node data, we will handle retry entirely within the game.
 
   // --- Game Over Handler ---
   const triggerGameOver = useCallback((status) => {
     setLanderState(prev => ({ ...prev, gameStatus: status }));
 
-    const outcome = status === 'landed' ? successOutcome : failureOutcome;
-    if (outcome) {
-      setTimeout(() => handleGameComplete(outcome), 2000); // 2-second delay for user to see result
-    } else {
-      console.warn(`No ${status} outcome defined in lesson JSON`);
+    if (status === 'landed') {
+      if (successOutcome) {
+        timeoutRef.current = setTimeout(() => handleGameComplete(successOutcome), 2000);
+      } else {
+        console.warn(`Landed, but no "success" outcome was defined in the lesson data.`);
+      }
     }
-  }, [handleGameComplete, successOutcome, failureOutcome]);
+  }, [handleGameComplete, successOutcome]);
 
 
   // --- Main Game Loop ---
@@ -134,6 +136,7 @@ const LunarLanderDemo = ({ node }) => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       cancelAnimationFrame(gameLoopRef.current);
+      clearTimeout(timeoutRef.current);
     };
   }, [gameLoop]);
 
@@ -190,8 +193,7 @@ const LunarLanderDemo = ({ node }) => {
         {gameStatus !== 'pending' && (
             <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-4">
                 {getOverlay()}
-                {/* Only show retry if there isn't a failure branch */}
-                {!failureOutcome && (gameStatus === 'crashed' || gameStatus === 'outOfFuel') && (
+                {(gameStatus === 'crashed' || gameStatus === 'outOfFuel') && (
                   <button onClick={handleRetry} className="mt-4 bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-lg flex items-center gap-2">
                     <RefreshCw size={16} /> Try Again
                   </button>
@@ -212,5 +214,3 @@ const LunarLanderDemo = ({ node }) => {
 };
 
 export default LunarLanderDemo;
-
-
