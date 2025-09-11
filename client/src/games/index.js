@@ -13,6 +13,11 @@ import SystemCheckDemo from './SystemCheckDemo';
 import RoverPowerGridDemo from './RoverPowerGridDemo';
 import BasePowerGridDemo from './BasePowerGridDemo';
 import StructuralReinforcementDemo from './StructuralReinforcementDemo';
+import TransitLightCurveDemo from './TransitLightCurveDemo';
+import ProbeTrajectoryPlotter from './ProbeTrajectoryPlotter';
+import AtmosphericSpectrometer from './AtmosphericSpectrometer';
+import CrewSelectionDemo from './CrewSelectionDemo';
+import OutpostBlueprintDesigner from './OutpostBlueprintDesigner';
 
 export const GameRegistry = {
   solar_flare_demo: SolarFlareDemo,
@@ -32,5 +37,10 @@ export const GameRegistry = {
   base_power: BasePowerGridDemo, // Alias for lesson compatibility
   structural_reinforcement_demo: StructuralReinforcementDemo,
   structural_reinforcement: StructuralReinforcementDemo, // Alias for lesson compatibility
+  transit_light: TransitLightCurveDemo,
+  probe_trajectory: ProbeTrajectoryPlotter,
+  atmo_spec: AtmosphericSpectrometer,
+  crew_selection: CrewSelectionDemo,
+  outpost_blueprint: OutpostBlueprintDesigner, 
   // Add other games here
 };
