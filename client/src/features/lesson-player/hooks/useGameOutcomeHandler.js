@@ -21,6 +21,10 @@ export const useGameOutcomeHandler = (node) => {
   const outcomes = node.data.options || node.data.outcomes || [];
 
   const handleGameComplete = (outcome) => {
+    // console.log('🎮 useGameOutcomeHandler: handleGameComplete called');
+    // console.log('🎮 Outcome received:', outcome);
+    // console.log('🎮 Available outcomes:', outcomes);
+    
     if (!outcome) {
       console.error('handleGameComplete called with an empty outcome.');
       return;
@@ -32,12 +36,16 @@ export const useGameOutcomeHandler = (node) => {
       // Legacy support for string arrays
       const outcomeIndex = outcomes.findIndex((o) => o.toLowerCase() === outcome.toLowerCase());
       sourceHandle = `game-outcome-${outcomeIndex}-${toKebabCase(outcome)}`;
+      // console.log('🎮 String outcome - generated sourceHandle:', sourceHandle);
     } else {
       // New format: array of objects with id and text.
       // The sourceHandle format is derived from the handle group and output ID in the builder.
       sourceHandle = `game-outcome-${outcome.id}`;
+      // console.log('🎮 Object outcome - generated sourceHandle:', sourceHandle);
     }
 
+    // console.log('🎮 Final sourceHandle:', sourceHandle);
+    // console.log('🎮 Calling advanceLesson with sourceHandle:', sourceHandle);
     advanceLesson(sourceHandle);
   };
 

@@ -9,6 +9,10 @@ import GravityWellDemo from './GravityWellDemo';
 import SatelliteBuilderDemo from './SatelliteBuilderDemo';
 import RocketStackerDemo from './RocketStackerDemo';
 import LunarLanderDemo from './LunarLanderDemo';
+import SystemCheckDemo from './SystemCheckDemo';
+import RoverPowerGridDemo from './RoverPowerGridDemo';
+import BasePowerGridDemo from './BasePowerGridDemo';
+import StructuralReinforcementDemo from './StructuralReinforcementDemo';
 import TransitLightCurveDemo from './TransitLightCurveDemo';
 import ProbeTrajectoryPlotter from './ProbeTrajectoryPlotter';
 import AtmosphericSpectrometer from './AtmosphericSpectrometer';
@@ -27,6 +31,12 @@ export const GameRegistry = {
   satellite_builder: SatelliteBuilderDemo,
   rocket_stacker: RocketStackerDemo,
   lunar_lander: LunarLanderDemo,
+  system_check_demo: SystemCheckDemo,
+  rover_power_grid_demo: RoverPowerGridDemo,
+  base_power_grid_demo: BasePowerGridDemo,
+  base_power: BasePowerGridDemo, // Alias for lesson compatibility
+  structural_reinforcement_demo: StructuralReinforcementDemo,
+  structural_reinforcement: StructuralReinforcementDemo, // Alias for lesson compatibility
   transit_light: TransitLightCurveDemo,
   probe_trajectory: ProbeTrajectoryPlotter,
   atmo_spec: AtmosphericSpectrometer,
