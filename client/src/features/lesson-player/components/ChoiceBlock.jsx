@@ -3,6 +3,8 @@ import { useLessonStore } from '../hooks/useLessonStore';
 import useSound from 'use-sound';
 import choiceSound from '../../../assets/sounds/Button02.wav';
 import { speak, cancelSpeech } from '../services/ttsService';
+import { saveChoice } from '../services/progressApi';
+import { auth } from '../../../lib/firebase';
 
 /**
  * Converts a string to kebab-case.
@@ -27,6 +29,7 @@ const ChoiceBlock = ({ node, isActive }) => {
   const [playChoice] = useSound(choiceSound, { volume: 0.25 });
   const advanceLesson = useLessonStore((state) => state.advanceLesson);
   const recordAnswer = useLessonStore((state) => state.recordAnswer);
+  const lesson = useLessonStore((state) => state.lesson);
   const selectedOptionIndex = useLessonStore((state) =>
     state.userAnswers.get(node.id),
   );
@@ -73,7 +76,8 @@ const ChoiceBlock = ({ node, isActive }) => {
    * @param {object} option - The selected option object, containing id and text.
    * @param {number} optionIndex - The index of the selected option.
    */
-  const handleOptionClick = (option, optionIndex) => {
+  const handleOptionClick = async (option, optionIndex) => {
+    
     if (isActive) {
       playChoice();
       // From NarrationBlock: calling cancel() inside a click handler helps "unlock"
@@ -82,6 +86,22 @@ const ChoiceBlock = ({ node, isActive }) => {
       // The sourceHandle format is derived from the node type and output handle ID in the builder.
       const sourceHandle = `${node.type}-out-${option.id}`;
       recordAnswer(node.id, optionIndex);
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        alert("Please log in to save your progress.");
+        return;
+      }
+      const missionId = lesson?.id || 'unknown_mission';
+      const blockId = node?.id || 'unknown_block';
+      const choiceText = option?.text || 'choice';
+      const tag = option?.tag || null; // add 'tag' to your option data if you want traits counted
+
+    try {
+      await saveChoice(userId, missionId, blockId, { text: choiceText, tag });
+    } catch (err) {
+      console.warn('Failed to save choice:', err);
+      // (optional) you could still advance even if the save fails
+    }
       advanceLesson(sourceHandle);
     }
   };

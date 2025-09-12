@@ -5,3 +5,4 @@ langchain_core
 dotenv
 langchain
 langchain_groq
+firebase-admin

@@ -6,25 +6,33 @@ import ChoiceBlock from './ChoiceBlock';
 import GameInteractionBlock from './GameInteractionBlock';
 import AITriggerBlock from './AITriggerBlock';
 import QuizBlock from './QuizBlock';
+import DebriefBlock from './DebriefBlock';
 
-// A map to associate node types with their corresponding components.
-// This makes it easy to add new node types without changing the rendering logic.
+// Map node types → components (include end-of-lesson aliases)
 const nodeComponentMap = {
   narration: NarrationBlock,
   choice: ChoiceBlock,
   gameInteraction: GameInteractionBlock,
   aiTrigger: AITriggerBlock,
   quiz: QuizBlock,
+
+  debrief: DebriefBlock,
+  summary: DebriefBlock,
+  missionComplete: DebriefBlock,
+  end: DebriefBlock,
+  result: DebriefBlock,
+  finish: DebriefBlock,
 };
 
 const ChatPanel = () => {
   const history = useLessonStore((state) => state.history);
   const currentNode = useLessonStore((state) => state.currentNode);
-  const [messages, setMessages] = useState([]); // For user messages
+
+  const [messages, setMessages] = useState([]);   // user-typed chat messages
   const [inputValue, setInputValue] = useState('');
   const chatContainerRef = useRef(null);
 
-  // Effect to scroll to the bottom of the chat when new messages or history items are added.
+  // Auto-scroll to bottom on new history/messages
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -32,11 +40,10 @@ const ChatPanel = () => {
   }, [history, messages]);
 
   const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      setMessages([...messages, { id: Date.now(), text: inputValue, sender: 'user' }]);
-      setInputValue('');
-      // Here you would typically send the message to an AI service
-    }
+    if (!inputValue.trim()) return;
+    setMessages((m) => [...m, { id: Date.now(), text: inputValue, sender: 'user' }]);
+    setInputValue('');
+    // send to AI service here if needed
   };
 
   const renderNodeContent = (node, isActive) => {
@@ -53,11 +60,10 @@ const ChatPanel = () => {
     const Component = nodeComponentMap[node.type];
 
     if (Component) {
-      // For choice blocks, isActive is crucial to enable/disable buttons.
-      // For other blocks, it can be used for styling, like highlighting.
       return <Component node={node} isActive={isActive} />;
     }
 
+    // Fallback message if a new node type appears
     return (
       <div className="text-center text-gray-500">
         <p>Unsupported node type: {node.type}</p>
@@ -68,38 +74,40 @@ const ChatPanel = () => {
   return (
     <div className="bg-gray-800/50 p-4 rounded-lg h-full flex flex-col">
       <h2 className="text-lg font-bold text-cyan-green mb-4">Chat Panel</h2>
+
       <div
         ref={chatContainerRef}
         className={`flex-grow flex flex-col space-y-4 overflow-y-auto p-2 ${
           history.length === 0 && !currentNode ? 'justify-center items-center' : 'justify-start'
         }`}
       >
-        {/* Show initial message if the lesson hasn't started */}
+        {/* Initial message before lesson starts */}
         {history.length === 0 && !currentNode && renderNodeContent(null, false)}
 
-        {/* Render lesson history */}
+        {/* Lesson history */}
         {history.map((node, index) => (
           <div key={`${node.id}-${index}`} className="self-start w-full">
             {renderNodeContent(node, node.id === currentNode?.id)}
           </div>
         ))}
 
-        {/* Render user messages */}
+        {/* User messages */}
         {messages.map((msg) => (
           <div
             key={msg.id}
             className="max-w-xs md:max-w-md p-3 rounded-xl bg-blue-600 text-white self-end"
           >
-             {msg.text}
+            {msg.text}
           </div>
         ))}
       </div>
+
       <div className="mt-4 flex items-center gap-2">
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+          onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}  // onKeyPress → onKeyDown
           placeholder="Ask a question..."
           className="flex-grow p-2 rounded bg-gray-900/80 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-cyan-green"
         />

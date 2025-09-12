@@ -27,7 +27,7 @@ const DashboardIndexPage = () => {
           </Link>
 
           <Link
-            to="#"
+            to="progress"
             onClick={playCta}
             className="flex items-center justify-center lg:justify-start gap-3 px-4 py-3 text-lg font-bold text-white 
                        bg-gradient-to-r from-sky-500/80 to-sky-600/80 

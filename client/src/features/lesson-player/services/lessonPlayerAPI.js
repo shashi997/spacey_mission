@@ -1,5 +1,7 @@
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { saveFinalSummary } from './progressApi';
+
 
 /**
  * Fetches the design of a specific lesson, including its nodes and edges, from Firestore.
@@ -63,5 +65,26 @@ export const getLessonMetadata = async (lessonId) => {
   } catch (error) {
     console.error(`Error fetching lesson metadata for lessonId ${lessonId}:`, error);
     throw error;
+  }
+};
+
+
+
+export const completeLessonOnce = async (
+  uid,
+  lessonId,
+  { outcome = 'Mission Complete.', traits = [] } = {}
+) => {
+  if (!uid || !lessonId) return;
+
+  // idempotent: only write if not already completed
+  const mRef = doc(db, 'users', uid, 'missions', lessonId);
+  const snap = await getDoc(mRef);
+  if (snap.exists() && (snap.data()?.completed || snap.data()?.finalSummary)) return;
+
+  try {
+    await saveFinalSummary(uid, lessonId, { outcome, traits });
+  } catch (e) {
+    console.warn('completeLessonOnce failed:', e);
   }
 };

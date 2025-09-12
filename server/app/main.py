@@ -7,11 +7,14 @@ from .agents.analysis import analysis
 from .agents.socratic import socratic
 from .agents.feedback import feedback
 
+# from .firebase_init import db  # ensures Firebase Admin is initialized
+# from .routers.progress import router as progress_router
+
 app = FastAPI(title="Agentic Workflow API")
 
 origins = [
-    "http://localhost:3000",  
-   
+    "http://localhost:3000",
+    "http://localhost:5173",
 ]
 
 app.add_middleware(
@@ -21,6 +24,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# app.include_router(progress_router)
 
 class TheInput(BaseModel):
     message: str
