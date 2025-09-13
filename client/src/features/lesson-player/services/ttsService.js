@@ -1,17 +1,14 @@
-// Toggle between TTS providers: 'browser' or 'gcp'
 import { importPKCS8, SignJWT } from 'jose';
-// Load GCP service account credentials from Vite env (client-side)
-// IMPORTANT: Private keys in client env are visible in the built bundle. Use only for development.
+
 const serviceAccount = {
   project_id: import.meta.env.VITE_GCP_TTS_PROJECT_ID || '',
   client_email: import.meta.env.VITE_GCP_TTS_CLIENT_EMAIL || '',
-  // Convert literal \n to real newlines
   private_key: (import.meta.env.VITE_GCP_TTS_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
   token_uri: import.meta.env.VITE_GCP_TTS_TOKEN_URI || 'https://oauth2.googleapis.com/token',
 };
 
 // Toggle between TTS providers: 'browser' or 'gcp'
-export const TTS_PROVIDER = 'gcp'; // Use Google Cloud TTS by default
+export const TTS_PROVIDER = 'gcp'; 
 
 // Browser TTS state
 let voices = [];
@@ -30,7 +27,7 @@ const GCP_TTS_CONFIG = {
   projectId: serviceAccount.project_id,
   voice: {
     languageCode: 'en-GB',
-    name: 'en-GB-Neural2-A', // British female voice (Neural2)
+    name: 'en-GB-Neural2-A',
     ssmlGender: 'FEMALE'
   },
   audioConfig: {
@@ -217,21 +214,13 @@ const speakWithBrowser = async (text) => {
   const utterance = new SpeechSynthesisUtterance(text);
   const availableVoices = window.speechSynthesis.getVoices();
 
-  // --- Voice Selection ---
-  let selectedVoice =
-    // 1. Google Female English
-    availableVoices.find(v => v.name.includes('Google') && v.name.includes('Female') && v.lang.startsWith('en-')) ||
-    // 2. Any Google English
-    availableVoices.find(v => v.name.includes('Google') && v.lang.startsWith('en-')) ||
-    // 3. Zira or Luciana
-    availableVoices.find(v => v.lang.startsWith('en-') && ['Zira','Luciana'].some(n => v.name.includes(n))) ||
-    // 4. Any Female English
-    availableVoices.find(v => v.name.includes('Female') && v.lang.startsWith('en-')) ||
-    // 5. US English
-    availableVoices.find(v => v.lang === 'en-US') ||
-    // 6. Any English
-    availableVoices.find(v => v.lang.startsWith('en-'));
+  // --- Voice Selection (single British Female) ---
+  let selectedVoice = availableVoices.find(
+    v => v.name === 'Google UK English Female' || v.name.includes('Google UK English Female')
+  );
 
+  // Force British English locale
+  utterance.lang = 'en-GB';
   if (selectedVoice) {
     utterance.voice = selectedVoice;
   }
@@ -389,14 +378,8 @@ export const isTTSSpeaking = () => isSpeaking;
  */
 export const getAvailableVoices = () => {
   if (TTS_PROVIDER === 'gcp') {
-    return [
-      { name: 'en-GB-Neural2-A', description: 'British Female (Neural2-A)' },
-      { name: 'en-GB-Neural2-B', description: 'British Male (Neural2-B)' },
-      { name: 'en-GB-Neural2-C', description: 'British Female (Neural2-C)' },
-      { name: 'en-GB-Neural2-D', description: 'British Male (Neural2-D)' },
-      { name: 'en-GB-Neural2-F', description: 'British Female (Neural2-F)' }
-    ];
+    return [{ name: 'en-GB-Neural2-A', description: 'British Female (Neural2-A)' }];
   } else {
-    return voices.map(v => ({ name: v.name, description: `${v.lang} - ${v.name}` }));
+    return [{ name: 'Google UK English Female', description: 'en-GB - Google UK English Female' }];
   }
 };
